@@ -1,61 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NORMAL</title>
-    <link rel="stylesheet" href="style/style.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style/style.css" />
+  </head>
+  <body>
     <div id="main">
-        <div id="page1">
-            <div class="logo">
-                <img src="images/logo.png" alt="">
-            </div>
-            <nav>
-                <div class="left">
-                    <h4>home</h4>
-                    <h4>about</h4>
-                    <h4>help</h4>
-                    <h4>forum</h4>
-                    <h4>test</h4>
-                </div>
-                <div class="right">
-                    <h3>login <span>for student</span></h3>
-                    <h3>login <span>for college</span></h3>
-                </div>
-            </nav>
+      <div id="page1">
+        <div class="logo">
+          <img src="images/logo.png" alt="" />
+        </div>
+        <nav>
+          <div class="left">
+            <h4>home</h4>
+            <h4>about</h4>
+            <h4>help</h4>
+            <h4>forum</h4>
+            <h4>test</h4>
+          </div>
+          <div class="right">
+            <h3>login <span>for student</span></h3>
+            <h3>login <span>for college</span></h3>
+          </div>
+        </nav>
 
-            <div class="heading">
-                <h1>NORMAL</h1>
-            </div>
+        <div class="heading" data-scroll data-scroll-speed="3">
+          <h1>NORMAL</h1>
         </div>
-        <div id="page2">
-            <div class="heading">
-                some mindful games
-            </div>
-            <div class="second_page2">
-                <div class="box"><h2>game name</h2></div>
-                <div class="box"><h2>game name</h2></div>
-                <div class="box"><h2>game name</h2></div>
-            </div>
+      </div>
+      <div id="page2">
+        <div class="heading">
+          <div class="sliding_head_div"></div>
+          some mindful games
         </div>
-        <div id="page3">
-            <div class="heading">
-                HOW NORMAL ARE YOU
-            </div>
-            <div class="second_page3">
-                <div class="box"><h2>game name</h2></div>
-                <div class="box"><h2>game name</h2></div>
-                <div class="box"><h2>game name</h2></div>
-            </div>
+        <div class="second_page2">
+          <div class="box">
+            <h2 data-scroll data-scroll-speed="-1.5">game name</h2>
+          </div>
+          <div class="box">
+            <h2 data-scroll data-scroll-speed="-1.5">game name</h2>
+          </div>
+          <div class="box">
+            <h2 data-scroll data-scroll-speed="-1.5">game name</h2>
+          </div>
         </div>
-        <div id="page4">
+      </div>
+      <div id="page3">
+        <div class="heading">
+          <div class="sliding_head_div"></div>
+          HOW NORMAL ARE YOU
+        </div>
 
+        <div class="second_page3">
+          <div class="box" data-scroll data-scroll-speed="3">
+            <h2>OVERTHINKING TEST</h2>
+            <p>
+              Imagine your brain is running 100 Chrme tabss at once - some are
+              about tomorrow's viva, some about that text you sent two months
+              ago, and one is just playing random cat videos. That's
+              overthinking mode. This meter checks if your thoughts are on
+              turbo-speed WiFi or just chilling at normal bandwidth.
+            </p>
+            <h4>go to test <i class="ri-arrow-right-up-line"></i></h4>
+          </div>
+          <div class="box" data-scroll data-scroll-speed="2">
+            <h2>BRAIN BATTERY</h2>
+            <p>
+              Ever felt like your brain is just running on 10% battery but still
+              pushing through assignments, reels, and all the late-night chai
+              sessions? This test is your brain's vibe-check meter. Let's see if
+              you need a recharge nap or you're secretly running on infinite
+              battery like Iron Man's arc reactor.
+            </p>
+            <h4>go to test <i class="ri-arrow-right-up-line"></i></h4>
+          </div>
+          <div class="box" data-scroll data-scroll-speed="1">
+            <h2>LOW-KEY VIBE CHECK</h2>
+            <p>
+              You know that mood when you just wanna wrap yourself in a blanket
+              burrito, binge sad Spotify playlists, and ghost everyone because
+              even typing 'lol' feels heavy? Yeah, that's the low-key vibes
+              we're checking here. It's not about labels, it's about seeing if
+              your brain is craving some sunshine or just some extra chill time.
+            </p>
+            <h4>go to test <i class="ri-arrow-right-up-line"></i></h4>
+          </div>
         </div>
+      </div>
+      <div id="page4"></div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"
+      integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"
+      integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script src="./javascript/script.js"></script>
-</body>
+  </body>
 </html>

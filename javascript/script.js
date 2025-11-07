@@ -1,4 +1,46 @@
 gsap.registerPlugin(ScrollTrigger);
+
+function locomotiveJS(){
+
+  const locoScroll = new LocomotiveScroll({
+    el: document.querySelector("#main"),
+    smooth: true,
+
+    // for tablet smooth
+    tablet: { smooth: true },
+
+    // for mobile
+    smartphone: { smooth: true },
+  });
+  locoScroll.on("scroll", ScrollTrigger.update);
+
+  ScrollTrigger.scrollerProxy("#main", {
+    scrollTop(value) {
+      return arguments.length
+        ? locoScroll.scrollTo(value, 0, 0)
+        : locoScroll.scroll.instance.scroll.y;
+    },
+    getBoundingClientRect() {
+      return {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    },
+    // 🧠 ADD THIS PART — detects if transform is used, else use fixed
+    pinType: document.querySelector("#main").style.transform
+      ? "transform"
+      : "fixed",
+  });
+
+
+
+  ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
+
+  ScrollTrigger.refresh();
+
+}
 function loadingAnimation() {
   let loadingtimeline = gsap.timeline();
 
@@ -44,10 +86,12 @@ function logoAnimation() {
       trigger: "#page2",
       // markers: true,
       scrub: 1,
+      scroller: "#main",
       end: "top 60%",
       // pin: true,
     },
   });
 }
+locomotiveJS();
 loadingAnimation();
 logoAnimation();
