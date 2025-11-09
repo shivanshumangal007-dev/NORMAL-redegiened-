@@ -1,17 +1,26 @@
 gsap.registerPlugin(ScrollTrigger);
+const locoScroll = new LocomotiveScroll({
+  el: document.querySelector("#main"),
+  smooth: true,
 
+  // for tablet smooth
+  tablet: { smooth: true },
+
+  // for mobile
+  smartphone: { smooth: true },
+});
 function locomotiveJS(){
 
-  const locoScroll = new LocomotiveScroll({
-    el: document.querySelector("#main"),
-    smooth: true,
+  // const locoScroll = new LocomotiveScroll({
+  //   el: document.querySelector("#main"),
+  //   smooth: true,
 
-    // for tablet smooth
-    tablet: { smooth: true },
+  //   // for tablet smooth
+  //   tablet: { smooth: true },
 
-    // for mobile
-    smartphone: { smooth: true },
-  });
+  //   // for mobile
+  //   smartphone: { smooth: true },
+  // });
   locoScroll.on("scroll", ScrollTrigger.update);
 
   ScrollTrigger.scrollerProxy("#main", {
@@ -152,10 +161,36 @@ function footerAnimation(){
   });
 }
 
+// function page3MouseHover() {
+//   let boxes = document.querySelectorAll("#page3 .second_page3 .box");
+
+//   boxes.forEach((box) => {
+//     box.addEventListener("mousemove", function(dets) {
+//       let mouseDiv = box.querySelector(".mouse_div");
+//       // const scrollY = locoScroll.scroll.instance.scroll.y;
+//       gsap.to(mouseDiv, {
+//         opacity: 1,
+//         x: dets.x-600,
+//         y: dets.y ,
+//       });
+//       // console.log(dets.x);
+//     });
+//   });
+//   boxes.forEach((box) => {
+//     box.addEventListener("mouseleave", function () {
+//       let mouseDiv = box.querySelector(".mouse_div");
+//       gsap.to(mouseDiv, {
+//         opacity: 0,
+//       });
+//     });
+//   });
+// }
+
 locomotiveJS();
 loadingAnimation();
 logoAnimation();
 Page4animation();
 footerAnimation();
+// page3MouseHover();
 
 

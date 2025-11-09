@@ -10,7 +10,7 @@
   font-family: Saira;
   src: url(../fonts/Saira.ttf);
 }
-@import url("https://fonts.googleapis.com/css2?family=Monomaniac+One&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 :root {
   --heading_font: futura;
   --font_1: BebasNeue;
@@ -280,6 +280,39 @@ body {
   letter-spacing: 0.4vw;
   font-weight: 400;
 }
+#page3 .second_page3 .box:nth-child(1) .mouse_div{
+    width: 3vw;
+    height: 3vw;
+    background-color: #52beaf91;
+    box-shadow: 2px 2px 20px #45bcacbc;
+    position:absolute;
+    top: 0;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+}
+#page3 .second_page3 .box:nth-child(2) .mouse_div{
+    width: 3vw;
+    height: 3vw;
+    box-shadow: 2px 2px 20px #58a4f1cb;
+    background-color: #499bedcc;
+    position:absolute;
+    top: 0;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+}
+#page3 .second_page3 .box:nth-child(3) .mouse_div{
+    width: 3vw;
+    box-shadow: 2px 2px 20px #ac5c44d6;
+    height: 3vw;
+    background-color: #ff8965ab;
+    position:absolute;
+    top: 0;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+}
 #page3 .second_page3 .box h4 {
   font-size: 1vw;
   text-align: center;
@@ -305,6 +338,9 @@ body {
   font-size: 1.4vw;
   font-weight: 400;
   text-align: center;
+  /* letter-spacing: 0.4vw;
+  line-height:1.5vw;
+  font-family: "Nunito Sans", sans-serif; */
 }
 /* page4 */
 #page4 {
