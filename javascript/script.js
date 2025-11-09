@@ -80,7 +80,7 @@ function logoAnimation() {
   //     // pin: true,
   //   },
   // });
-  gsap.to("#page1 .logo", {
+  gsap.to(".logo", {
     opacity: 1,
     scrollTrigger: {
       trigger: "#page2",
@@ -92,6 +92,46 @@ function logoAnimation() {
     },
   });
 }
+
+
+
 locomotiveJS();
 loadingAnimation();
 logoAnimation();
+
+gsap.from("#page4 img.right", {
+  opacity: 0,
+  // y: 10,
+  scrollTrigger: {
+    trigger: "#page4",
+    scroller: "#main",
+    // markers: true,
+    start: "top 30%",
+    end: "top 25%",
+    scrub: true,
+  },
+});
+gsap.from("#page4 img.left", {
+  opacity: 0,
+  // y: 10,
+  scrollTrigger: {
+    trigger: "#page4",
+    scroller: "#main",
+    // markers: true,
+    start: "top 30%",
+    end: "top 25%",
+    scrub: true,
+  },
+});
+gsap.from("#page4 img.center", {
+  opacity: 0,
+  // y: 10,
+  scrollTrigger: {
+    trigger: "#page4",
+    scroller: "#main",
+    // markers: true,
+    start: "top 30%",
+    end: "top 25%",
+    scrub: true,
+  },
+});
