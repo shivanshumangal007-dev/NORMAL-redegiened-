@@ -405,11 +405,109 @@ body {
 /* page6 */
 
 #page6{
-    width: 100%;
-  background-color: #93d1cc;
+  width: 100%;
+  background-color: #5DBECE;
   min-height: 100vh;
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  /* flex-direction: column; */
   align-items: center;
+  justify-content: space-evenly;
+}
+#page6 .top_heading{
+  width: 100vw;
+  text-align: center;
+  font-family: var(--font_1);
+  letter-spacing: 10px;
+  color: white;
+  font-size: 8vw;
+  font-weight: 200;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 1px 1px 10px #31313174;
+  position: relative;
+  margin-top:4vw;
+}
+#page6 .left_image{
+  width: 40vw;
+}
+#page6 .left_image img{
+  width: 100%;
+}
+#page6 .right_discription{
+  width: 40vw;
+  font-size: 2.5vw;
+  z-index: 3;
+  font-weight: 300;
+  /* margin-top: 2vw; */
+  text-shadow: 2px 2px 20px #000000af;
+  text-align: center;
+  color: white;
+}
+#page7{
+  width: 100%;
+  background-color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  /* flex-direction: column; */
+  align-items: center;
+  justify-content: space-around;
+}
+#page7 .top_heading{
+  width: 100vw;
+  text-align: center;
+  font-family: var(--font_1);
+  letter-spacing: 10px;
+  color: #223A7A;
+  font-size: 8vw;
+  font-weight: 200;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 1px 1px 10px #31313174;
+  position: relative;
+  /* margin-top:4vw; */
+}
+#page7 .left_image{
+  margin-top: -3vw;
+  width: 40vw;
+}
+#page7 .left_image img{
+  width: 100%;
+}
+#page7 .right_discription{
+  width: 40vw;
+  font-size: 2.5vw;
+  z-index: 3;
+  font-weight: 300;
+  background-color: #223A7A;
+  padding: 3vw 2vw ;
+  margin-top: 2vw; 
+  box-shadow: 2px 2px 20px #5364ffaf;
+  border-radius: 20px;
+  text-align: center;
+  margin-top: -3vw;
+  color: white;
+}
+footer{
+  width: 100%;
+  background-color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+footer h2{
+  position: absolute;
+  bottom: 2vw;
+  color: white;
+  width: 100%;
+  font-size: 2.5vw;
+  z-index: 3;
+  font-weight: 300;
+  text-align: center;
 }

@@ -92,46 +92,70 @@ function logoAnimation() {
     },
   });
 }
+function Page4animation(){
+  gsap.from("#page4 img.right", {
+    opacity: 0,
+    // y: 10,
+    scrollTrigger: {
+      trigger: "#page4",
+      scroller: "#main",
+      // markers: true,
+      start: "top 30%",
+      end: "top 25%",
+      scrub: true,
+    },
+  });
+  gsap.from("#page4 img.left", {
+    opacity: 0,
+    // y: 10,
+    scrollTrigger: {
+      trigger: "#page4",
+      scroller: "#main",
+      // markers: true,
+      start: "top 30%",
+      end: "top 25%",
+      scrub: true,
+    },
+  });
+  gsap.from("#page4 img.center", {
+    opacity: 0,
+    // y: 10,
+    scrollTrigger: {
+      trigger: "#page4",
+      scroller: "#main",
+      // markers: true,
+      start: "top 30%",
+      end: "top 25%",
+      scrub: true,
+    },
+  });
+}
 
-
+function footerAnimation(){
+  gsap.to("footer", {
+    backgroundColor: "#111",
+    scrollTrigger: {
+      trigger: "footer",
+      scroller: "#main",
+      start: "top 50%",
+      // scrub: true,
+    },
+  });
+  gsap.from("footer img", {
+    opacity: 0,
+    scrollTrigger:{
+      trigger:"footer",
+      scroller: "#main",
+      scrub: true,
+      start: "top 50%",
+    }
+  });
+}
 
 locomotiveJS();
 loadingAnimation();
 logoAnimation();
+Page4animation();
+footerAnimation();
 
-gsap.from("#page4 img.right", {
-  opacity: 0,
-  // y: 10,
-  scrollTrigger: {
-    trigger: "#page4",
-    scroller: "#main",
-    // markers: true,
-    start: "top 30%",
-    end: "top 25%",
-    scrub: true,
-  },
-});
-gsap.from("#page4 img.left", {
-  opacity: 0,
-  // y: 10,
-  scrollTrigger: {
-    trigger: "#page4",
-    scroller: "#main",
-    // markers: true,
-    start: "top 30%",
-    end: "top 25%",
-    scrub: true,
-  },
-});
-gsap.from("#page4 img.center", {
-  opacity: 0,
-  // y: 10,
-  scrollTrigger: {
-    trigger: "#page4",
-    scroller: "#main",
-    // markers: true,
-    start: "top 30%",
-    end: "top 25%",
-    scrub: true,
-  },
-});
+
