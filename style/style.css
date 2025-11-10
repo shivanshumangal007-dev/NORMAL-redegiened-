@@ -89,6 +89,13 @@ body {
   color: #ffffff;
   text-transform: capitalize;
 }
+#page1 nav .left h4 a {
+  font-size: 1.3vw;
+  text-decoration: none;
+  cursor: pointer;
+  color: #ffffff;
+  text-transform: capitalize;
+}
 #page1 nav .right {
   display: flex;
   align-items: center;
