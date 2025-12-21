@@ -185,6 +185,7 @@ body {
 #page2 .second_page2 .box {
   background-image: url(../images/download.jpeg);
   background-position: center;
+  background-size: cover;
   width: 28vw;
   height: 100vh;
   display: flex;
@@ -195,11 +196,25 @@ body {
   margin-bottom: 2vw;
   /* margin: 20px; */
 }
-#page2 .second_page2 .box h2 {
+#page2 .second_page2 .box:nth-child(1) {
+  background-image: url(../images/game1.png);;
+}
+#page2 .second_page2 .box:nth-child(2) {
+  background-image: url(../images/game2.png);;
+}
+#page2 .second_page2 .box:nth-child(3) {
+  background-image: url(../images/game3.png);;
+}
+ a {
+  text-decoration: none;  
+  color: inherit;
+}
+#page2 .second_page2 .box a h2 {
   font-size: 2vw;
-  text-transform: capitalize;
-  background-color: aquamarine;
+  text-transform: uppercase;
+  background-color: rgb(32, 32, 32);
   border-radius: 40px;
+  color: white;
   padding: 0vw 5vw;
 }
 

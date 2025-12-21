@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calm Bubble Escape – Stress Relief Mini-Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg1: #dbeafe;
+      --bg2: #fce7f3;
+      --bg3: #dcfce7;
+      --card: rgba(255, 255, 255, 0.85);
+      --card-soft: rgba(255, 255, 255, 0.7);
+      --accent: #6366f1;
+      --accent-soft: #f973b6;
+      --text-main: #111827;
+      --text-soft: #4b5563;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(129, 140, 248, 0.25), transparent 55%),
+        radial-gradient(circle at 82% 0%, rgba(244, 114, 182, 0.25), transparent 55%),
+        radial-gradient(circle at 0% 100%, rgba(52, 211, 153, 0.25), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .shell {
+      width: min(960px, 96%);
+      height: min(640px, 90vh);
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr);
+      gap: 16px;
+      padding: 16px;
+      border-radius: 24px;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.96),
+        rgba(255, 255, 255, 0.86)
+      );
+      box-shadow: 0 18px 60px rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(14px);
+    }
+
+    @media (max-width: 860px) {
+      .shell {
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stage-wrap {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,0.95), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(129,140,248,0.28), transparent 70%),
+        radial-gradient(circle at 10% 80%, rgba(52,211,153,0.25), transparent 65%),
+        linear-gradient(135deg, #c7d2fe, #f9d0ff);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: pointer;
+    }
+
+    .stage-hint {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.25);
+      color: #f9fafb;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+    }
+
+    .card-soft {
+      background: var(--card-soft);
+      backdrop-filter: blur(12px);
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(148, 163, 184, 0.25);
+      color: var(--text-soft);
+    }
+
+    .pill-strong {
+      background: linear-gradient(120deg, #6366f1, #f973b6);
+      color: #f9fafb;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      font-size: 13px;
+      padding: 8px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(120deg, #6366f1, #f973b6);
+      color: white;
+      box-shadow: 0 10px 25px rgba(129, 140, 248, 0.45);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text-main);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-soft);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(148, 163, 184, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .small-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+      color: var(--text-soft);
+    }
+
+    .hint-list {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-left: 16px;
+      margin-top: 4px;
+    }
+
+    .hint-list li + li {
+      margin-top: 3px;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: rgba(52,211,153,0.08);
+      color: #047857;
+    }
+
+    .status.error {
+      background: rgba(248, 113, 113, 0.1);
+      color: #b91c1c;
+    }
+
+    .breath-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .breath-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+    }
+
+    .breath-dot.exhale {
+      background: #38bdf8;
+      box-shadow: 0 0 0 4px rgba(56,189,248,0.25);
+    }
+
+    .footer-text {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Game area -->
+    <div class="stage-wrap">
+      <canvas id="gameCanvas"></canvas>
+      <div class="stage-hint">
+        Tap gently to nudge the bubble toward the opening. No rush. 🌿
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="side">
+      <div class="card">
+        <h1>Calm Bubble Escape</h1>
+        <p class="subtitle">
+          A gentle bubble drifts inside a breathing boundary. From time to time,
+          a soft opening appears. Nudge the bubble toward it and let it drift out.
+        </p>
+
+        <div class="pill-row">
+          <span class="pill pill-strong">No score. No timer.</span>
+          <span class="pill">Soft physics</span>
+          <span class="pill">Pastel visuals</span>
+          <span class="pill">For quiet focus</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="restartBtn">Restart</button>
+          <button class="btn-secondary" id="recentreBtn">Re-centre bubble</button>
+          <button class="btn-ghost" id="pauseBtn">Pause</button>
+        </div>
+      </div>
+
+      <div class="card card-soft">
+        <div class="small-label">How to play</div>
+        <ul class="hint-list">
+          <li>Tap or click inside the arena to gently push the bubble.</li>
+          <li>The boundary breathes slowly – match its rhythm if you like.</li>
+          <li>A soft glowing gap appears on the border. Guide the bubble there.</li>
+        </ul>
+
+        <div class="breath-indicator">
+          <span class="breath-dot" id="breathDot"></span>
+          <span id="breathText">Inhale… walls expand gently</span>
+        </div>
+
+        <div class="status" id="statusText">
+          There is no right way to play. Move slowly, breathe, and let the bubble wander.
+        </div>
+      </div>
+
+      <div class="card card-soft footer-text">
+        This mini-game is designed for calm and curiosity, not performance. If you feel
+        tension, pause, breathe slowly, and watch the walls rise and fall.
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let width, height, dpr;
+    let cx, cy; // center of arena
+
+    // Bubble state
+    const bubble = {
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 16
+    };
+
+    // Wall breathing
+    let baseRadius = 0;
+    let breathPhase = 0;
+    const BREATH_PERIOD = 12; // seconds for full inhale + exhale
+
+    // Opening
+    let openingAngle = 0;
+    let openingHalfSize = Math.PI / 10; // +/- angle
+    let openingVisible = true;
+    let openingTimer = 0;
+    let openingState = "visible"; // "visible" | "hidden"
+
+    // Particles on escape
+    const particles = [];
+
+    // Game state
+    let lastTime = null;
+    let running = true;
+    let escaped = false;
+
+    const statusTextEl = document.getElementById("statusText");
+    const breathDotEl = document.getElementById("breathDot");
+    const breathTextEl = document.getElementById("breathText");
+    const restartBtn = document.getElementById("restartBtn");
+    const recenterBtn = document.getElementById("recentreBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      cx = width / 2;
+      cy = height / 2;
+      baseRadius = Math.min(width, height) * 0.35;
+
+      if (!escaped) {
+        bubble.x = cx;
+        bubble.y = cy;
+      }
+    }
+
+    window.addEventListener("resize", resize);
+
+    function resetGame() {
+      escaped = false;
+      bubble.x = cx;
+      bubble.y = cy;
+      bubble.vx = 0;
+      bubble.vy = 0;
+      breathPhase = 0;
+      openingTimer = 0;
+      openingState = "visible";
+      openingAngle = Math.random() * Math.PI * 2;
+      particles.length = 0;
+      statusTextEl.textContent =
+        "There is no right way to play. Move slowly, breathe, and let the bubble wander.";
+      statusTextEl.classList.remove("error");
+    }
+
+    function spawnOpeningState() {
+      if (openingState === "visible") {
+        // after 4–7 seconds visible, hide
+        const visibleDur = 4 + Math.random() * 3;
+        if (openingTimer > visibleDur) {
+          openingState = "hidden";
+          openingTimer = 0;
+        }
+      } else {
+        // after 3–5 seconds hidden, show new opening
+        const hiddenDur = 3 + Math.random() * 2;
+        if (openingTimer > hiddenDur) {
+          openingState = "visible";
+          openingTimer = 0;
+          openingAngle = Math.random() * Math.PI * 2;
+        }
+      }
+      openingVisible = (openingState === "visible");
+    }
+
+    function spawnParticles(x, y) {
+      const count = 45;
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 40 + Math.random() * 60;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 0,
+          maxLife: 0.8 + Math.random() * 0.5,
+          color: `hsla(${180 + Math.random() * 120}, 70%, 65%, 1)`
+        });
+      }
+    }
+
+    function updateParticles(dt) {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life += dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 10 * dt; // gentle gravity
+        if (p.life > p.maxLife) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function drawParticles() {
+      particles.forEach((p) => {
+        const alpha = Math.max(0, 1 - p.life / p.maxLife);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    function worldToAngle(x, y) {
+      const dx = x - cx;
+      const dy = y - cy;
+      return Math.atan2(dy, dx);
+    }
+
+    // Input -> gentle push
+    function getCanvasPoint(e) {
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+      if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function handleTap(e) {
+      if (!running) return;
+      if (escaped) return;
+
+      const p = getCanvasPoint(e);
+      const dx = bubble.x - p.x;
+      const dy = bubble.y - p.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      // Normalized direction from tap to bubble
+      const nx = dx / dist;
+      const ny = dy / dist;
+
+      const strength = 80; // px/sec impulse
+      bubble.vx += nx * strength;
+      bubble.vy += ny * strength;
+
+      statusTextEl.textContent =
+        "Nice. Small, gentle nudges work best. Watch how the bubble drifts.";
+    }
+
+    canvas.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      handleTap(e);
+    }, { passive: false });
+
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      handleTap(e);
+    }, { passive: false });
+
+    restartBtn.addEventListener("click", () => {
+      resetGame();
+    });
+
+    recenterBtn.addEventListener("click", () => {
+      bubble.x = cx;
+      bubble.y = cy;
+      bubble.vx = 0;
+      bubble.vy = 0;
+      statusTextEl.textContent = "Bubble re-centred. Try a different rhythm this time.";
+      statusTextEl.classList.remove("error");
+    });
+
+    pauseBtn.addEventListener("click", () => {
+      running = !running;
+      pauseBtn.textContent = running ? "Pause" : "Resume";
+    });
+
+    function update(dt) {
+      if (!running) return;
+
+      if (!escaped) {
+        // breathing phase
+        breathPhase += (2 * Math.PI / BREATH_PERIOD) * dt;
+      }
+
+      const tNorm = (Math.sin(breathPhase) + 1) / 2; // 0..1
+      const scale = 0.9 + 0.12 * tNorm;
+      const wallRadius = baseRadius * scale;
+
+      // update breath UI
+      if (Math.cos(breathPhase) > 0) {
+        // inhaling
+        breathDotEl.classList.remove("exhale");
+        breathTextEl.textContent = "Inhale… walls expand gently";
+      } else {
+        breathDotEl.classList.add("exhale");
+        breathTextEl.textContent = "Exhale… walls soften inward";
+      }
+
+      // bubble physics
+      if (!escaped) {
+        bubble.x += bubble.vx * dt;
+        bubble.y += bubble.vy * dt;
+
+        // friction
+        const friction = 0.92;
+        bubble.vx *= friction;
+        bubble.vy *= friction;
+
+        // keep bubble roughly near center if completely out
+        const dx0 = bubble.x - cx;
+        const dy0 = bubble.y - cy;
+        const dist0 = Math.sqrt(dx0 * dx0 + dy0 * dy0) || 1;
+
+        // check wall / opening
+        const angle = Math.atan2(dy0, dx0);
+        const inOpening = openingVisible && angleWithin(angle, openingAngle, openingHalfSize);
+
+        if (dist0 + bubble.radius > wallRadius) {
+          if (inOpening) {
+            // bubble can cross outwards
+            if (dist0 - bubble.radius > wallRadius + 8) {
+              // fully escaped
+              escaped = true;
+              spawnParticles(bubble.x, bubble.y);
+              statusTextEl.textContent = "You made it out. Take one slow breath in… and out.";
+              statusTextEl.classList.remove("error");
+            }
+          } else {
+            // reflect gently inward
+            const overlap = (dist0 + bubble.radius) - wallRadius;
+            const nx = dx0 / dist0;
+            const ny = dy0 / dist0;
+            bubble.x -= nx * overlap;
+            bubble.y -= ny * overlap;
+
+            const proj = bubble.vx * nx + bubble.vy * ny;
+            if (proj > 0) {
+              bubble.vx -= proj * nx * 0.9;
+              bubble.vy -= proj * ny * 0.9;
+            }
+          }
+        }
+      }
+
+      // opening timer
+      openingTimer += dt;
+      spawnOpeningState();
+
+      // particles
+      updateParticles(dt);
+    }
+
+    function angleWithin(a, center, halfSize) {
+      // normalize to -PI..PI
+      const norm = (x) => {
+        while (x > Math.PI) x -= 2 * Math.PI;
+        while (x < -Math.PI) x += 2 * Math.PI;
+        return x;
+      };
+      const diff = norm(a - center);
+      return Math.abs(diff) <= halfSize;
+    }
+
+    function draw() {
+      // background sky
+      const grad = ctx.createLinearGradient(0, 0, width, height);
+      grad.addColorStop(0, "rgba(255,255,255,0.95)");
+      grad.addColorStop(0.4, "rgba(219,234,254,0.95)");
+      grad.addColorStop(1, "rgba(240,249,255,0.98)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      // small twinkles
+      ctx.fillStyle = "rgba(148,163,184,0.45)";
+      for (let i = 0; i < 80; i++) {
+        const x = (i * 47.3) % width;
+        const y = ((i * 91.7) % height) * 0.85;
+        const r = (i % 3 === 0 ? 1.2 : 0.7);
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // breathing wall
+      const tNorm = (Math.sin(breathPhase) + 1) / 2;
+      const scale = 0.9 + 0.12 * tNorm;
+      const wallRadius = baseRadius * scale;
+
+      // outer glow
+      const wallGrad = ctx.createRadialGradient(cx, cy, wallRadius * 0.1, cx, cy, wallRadius * 1.25);
+      wallGrad.addColorStop(0, "rgba(129,140,248,0.16)");
+      wallGrad.addColorStop(0.55, "rgba(244,114,182,0.13)");
+      wallGrad.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = wallGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, wallRadius * 1.25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // main boundary
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(148,163,184,0.9)";
+      ctx.beginPath();
+
+      if (openingVisible) {
+        // draw circle with gap
+        const start1 = openingAngle + openingHalfSize;
+        const end1 = openingAngle - openingHalfSize + Math.PI * 2;
+        ctx.arc(cx, cy, wallRadius, start1, end1, false);
+      } else {
+        ctx.arc(cx, cy, wallRadius, 0, Math.PI * 2);
+      }
+      ctx.stroke();
+
+      // highlight opening
+      if (openingVisible) {
+        const glowRadius = wallRadius + 3;
+        const start = openingAngle - openingHalfSize;
+        const end = openingAngle + openingHalfSize;
+        const openGrad = ctx.createRadialGradient(
+          cx + Math.cos(openingAngle) * wallRadius,
+          cy + Math.sin(openingAngle) * wallRadius,
+          0,
+          cx + Math.cos(openingAngle) * wallRadius,
+          cy + Math.sin(openingAngle) * wallRadius,
+          32
+        );
+        openGrad.addColorStop(0, "rgba(96,165,250,0.9)");
+        openGrad.addColorStop(1, "rgba(96,165,250,0)");
+
+        ctx.fillStyle = openGrad;
+        ctx.beginPath();
+        ctx.arc(
+          cx + Math.cos(openingAngle) * wallRadius,
+          cy + Math.sin(openingAngle) * wallRadius,
+          22,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(96,165,250,0.9)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(cx, cy, glowRadius, start, end);
+        ctx.stroke();
+      }
+
+      // bubble
+      if (!escaped) {
+        const g = ctx.createRadialGradient(
+          bubble.x - bubble.radius * 0.3,
+          bubble.y - bubble.radius * 0.3,
+          0,
+          bubble.x,
+          bubble.y,
+          bubble.radius * 1.8
+        );
+        g.addColorStop(0, "rgba(255,255,255,0.95)");
+        g.addColorStop(0.3, "rgba(129,140,248,0.9)");
+        g.addColorStop(0.8, "rgba(244,114,182,0.15)");
+        g.addColorStop(1, "rgba(244,114,182,0)");
+
+        // small shadow
+        ctx.fillStyle = "rgba(15,23,42,0.10)";
+        ctx.beginPath();
+        ctx.ellipse(
+          bubble.x,
+          bubble.y + bubble.radius * 0.9,
+          bubble.radius * 1.05,
+          bubble.radius * 0.4,
+          0,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(255,255,255,0.5)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(bubble.x, bubble.y, bubble.radius + 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // particles
+      drawParticles();
+    }
+
+    function loop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = Math.min(0.033, (timestamp - lastTime) / 1000);
+      lastTime = timestamp;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(loop);
+    }
+
+    function init() {
+      resize();
+      resetGame();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>

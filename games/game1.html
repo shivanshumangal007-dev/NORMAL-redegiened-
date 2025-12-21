@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Light Catcher — Calm Mini-Game</title>
+  <style>
+    :root{
+      --bg1: #071023; /* deep navy */
+      --bg2: #03102b; /* darker */
+      --panel: rgba(255,255,255,0.04);
+      --muted: rgba(255,255,255,0.65);
+      --accent: #e6f7ff;
+      --glass: rgba(255,255,255,0.03);
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;
+      background:
+        radial-gradient(600px 300px at 10% 10%, rgba(94,231,223,0.03), transparent 8%),
+        radial-gradient(420px 240px at 90% 20%, rgba(180,144,202,0.02), transparent 8%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:var(--accent);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* twinkling stars */
+    .stars {
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 80px 80px; opacity:0.45; mix-blend-mode:screen; filter:blur(0.6px);
+    }
+
+    .app{
+      width:min(980px,96%); max-width:980px; height:min(700px,88vh);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px; padding:18px; box-shadow:0 12px 60px rgba(2,6,23,0.6);
+      display:flex; gap:18px; position:relative; z-index:1;
+    }
+
+    /* left: game area */
+    .stage{flex:1;border-radius:10px;position:relative;overflow:hidden;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(94,231,223,0.02), transparent 10%),
+        linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      display:flex;align-items:center;justify-content:center;
+    }
+    canvas{width:100%;height:100%;display:block;background:transparent;touch-action:none}
+
+    .hint{
+      position:absolute;left:14px;bottom:12px;color:rgba(255,255,255,0.18);font-size:13px;pointer-events:none;
+      backdrop-filter: blur(2px);
+    }
+
+    /* right: controls */
+    .sidebar{width:300px;display:flex;flex-direction:column;gap:12px}
+    .card{background:var(--panel);padding:12px;border-radius:12px}
+    h1{font-size:18px;margin:0}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.04);color:var(--accent);padding:8px 10px;border-radius:8px;cursor:pointer}
+    .small{font-size:13px;color:var(--muted)}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input[type=range]{width:100%}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:13px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:860px){
+      .app{flex-direction:column;height:auto}.sidebar{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <main class="app" role="application" aria-label="Light Catcher calming mini game">
+    <section class="stage" id="stage">
+      <canvas id="canvas" aria-label="game canvas"></canvas>
+      <div class="hint">Move with mouse, touch, or arrow keys • Pop negative words or catch lights</div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="card">
+        <h1>Light Catcher — Relax & Release</h1>
+        <p class="small">Move the orb gently and pop drifting negative thoughts to release them. No score, no pressure — just calm.</p>
+        <div style="margin-top:12px">
+          <div class="small">Tips</div>
+          <div class="small">Tap or click a floating word to pop it. Music starts when you first interact.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <label for="speed">Spawn rate</label>
+        <input id="spawnRate" type="range" min="300" max="1600" step="50" value="900">
+        <div class="small" style="margin-top:8px">Lower = more frequent lights</div>
+
+        <label style="margin-top:12px">Orb size</label>
+        <input id="orbSize" type="range" min="18" max="48" step="1" value="28">
+        <div class="small">Adjust for comfort</div>
+      </div>
+
+      <div class="card controls">
+        <button id="playPause">Play</button>
+        <button id="reset">Reset</button>
+        <button id="soundToggle">Enable sound</button>
+      </div>
+
+      <div class="card">
+        <div class="small">Controls</div>
+        <ul style="padding-left:18px;margin:8px 0;color:var(--muted)">
+          <li>Move mouse / touch to steer orb</li>
+          <li>Arrow keys or A/D to move</li>
+          <li>Click Play to start</li>
+        </ul>
+      </div>
+
+      <div class="footer small card">Made for calm • Your data stays local</div>
+    </aside>
+  </main>
+
+  <script>
+    // Light Catcher — upgraded: ambient music, negative-word bubbles, pops, no score
+    (function(){
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const playPauseBtn = document.getElementById('playPause');
+      const resetBtn = document.getElementById('reset');
+      const spawnRateInput = document.getElementById('spawnRate');
+      const orbSizeInput = document.getElementById('orbSize');
+      const soundToggle = document.getElementById('soundToggle');
+
+      let W=0,H=0, lastTime=0, rafId=null;
+      let running=false;
+      let userInteracted=false;
+
+      // orb & objects
+      let orb = {x:0,y:0,r:28,vx:0};
+      const lights = []; // objects: {x,y,vy,r,hue,t,type,word,alpha}
+      let spawnTimer = 0;
+      let spawnInterval = Number(spawnRateInput.value); // ms
+
+      // negative words pool
+      const negativeWords = [
+        "Stress","Anxiety","Pressure","Fear","Overthinking","Sadness","Guilt","Loneliness",
+        "Doubt","Tension","Worry","Regret","Anger","Exhaustion","Hopeless"
+      ];
+
+      // audio
+      let audioCtx=null;
+      let ambientAudio=null;
+      let popBuffer=null;
+      let soundEnabled=false;
+
+      function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+
+      async function loadPop() {
+        try{
+          ensureAudio();
+          // small soft pop sound from pixabay (royalty-free). If blocked, fallback to oscillator.
+          const resp = await fetch('https://cdn.pixabay.com/download/audio/2022/03/15/audio_74fbbd14d5.mp3?filename=pop-94319.mp3');
+          const arr = await resp.arrayBuffer();
+          popBuffer = await audioCtx.decodeAudioData(arr);
+        }catch(e){ popBuffer = null; }
+      }
+
+      function playPop(x,y){
+        if(!soundEnabled) return;
+        if(!audioCtx) ensureAudio();
+        if(popBuffer){
+          const s = audioCtx.createBufferSource();
+          s.buffer = popBuffer;
+          const g = audioCtx.createGain();
+          g.gain.value = 0.25; // comfortable volume
+          s.connect(g); g.connect(audioCtx.destination);
+          s.start();
+        }else{
+          // fallback gentle click using oscillator
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type='triangle'; o.frequency.value = 900;
+          g.gain.value = 0.0001;
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start();
+          const now = audioCtx.currentTime;
+          g.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+          o.stop(now + 0.3);
+        }
+        // small visual sparkles are handled elsewhere
+      }
+
+      function startAmbient(){
+        if(!soundEnabled) return;
+        if(ambientAudio) return;
+        // create a gentle ambient loop via <audio> to keep it simple for low CPU
+        ambientAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/15/audio_8b285adf35.mp3?filename=relaxing-piano-112191.mp3');
+        ambientAudio.loop = true;
+        ambientAudio.volume = 0.20;
+        ambientAudio.play().catch(()=>{ /* autoplay may be blocked until gesture */ });
+      }
+
+      // resize
+      function resize(){
+        const rect = canvas.getBoundingClientRect();
+        // if element not sized yet, set to stage size
+        const stage = document.querySelector('.stage');
+        const style = getComputedStyle(stage);
+        const w = stage.clientWidth;
+        const h = stage.clientHeight;
+        W = Math.floor(w || window.innerWidth * 0.6);
+        H = Math.floor(h || window.innerHeight * 0.7);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        if(orb.x === 0 && orb.y === 0){ orb.x = W/2; orb.y = H*0.78; }
+      }
+
+      // input handling (pointer + touch)
+      let pointer = {x:null,y:null,down:false};
+      function updatePointerFromEvent(e){
+        const r = canvas.getBoundingClientRect();
+        pointer.x = e.clientX - r.left;
+        pointer.y = e.clientY - r.top;
+      }
+      window.addEventListener('mousemove', (e)=>{ updatePointerFromEvent(e); });
+      window.addEventListener('touchmove', (e)=>{ if(e.touches && e.touches[0]){ updatePointerFromEvent(e.touches[0]); } }, {passive:true});
+      window.addEventListener('touchstart', (e)=>{ if(e.touches && e.touches[0]) updatePointerFromEvent(e.touches[0]); pointer.down=true; startOnFirstGesture(); }, {passive:true});
+      window.addEventListener('touchend', ()=>{ pointer.down=false; });
+      window.addEventListener('mousedown', (e)=>{ updatePointerFromEvent(e); pointer.down=true; startOnFirstGesture(); });
+      window.addEventListener('mouseup', ()=>{ pointer.down=false; });
+      window.addEventListener('keydown', (e)=>{
+        if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A'){ orb.vx = -3; startOnFirstGesture(); }
+        if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D'){ orb.vx = 3; startOnFirstGesture(); }
+        if(e.key === ' '){ toggleRun(); startOnFirstGesture(); }
+      });
+      window.addEventListener('keyup', (e)=>{ if(['ArrowLeft','ArrowRight','a','A','d','D'].includes(e.key)) orb.vx = 0; });
+
+      // Spawn either a light or a word-bubble
+      function spawnLight(){
+        const x = Math.random()*(W-40)+20;
+        const speed = 20 + Math.random()*60; // px/sec
+        const size = 8 + Math.random()*22;
+        const hue = 180 + Math.random()*100;
+        const isWord = Math.random() < 0.32; // ~32% of spawns are word bubbles
+        const alpha = 0.85 - Math.random()*0.3;
+        if(isWord){
+          const word = negativeWords[Math.floor(Math.random()*negativeWords.length)];
+          lights.push({x, y: H + size, vy: speed * (0.4 + Math.random()*0.9), r: size+6, hue, t: Date.now(), type: 'word', word, alpha});
+        } else {
+          lights.push({x, y: H + size, vy: speed, r:size, hue, t: Date.now(), type: 'light', alpha});
+        }
+      }
+
+      // Click or tap to pop items directly
+      canvas.addEventListener('click', (e)=>{
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
+        // check for any object under pointer, prefer topmost
+        for(let i = lights.length -1; i >= 0; i--){
+          const L = lights[i];
+          const dx = cx - L.x;
+          const dy = cy - L.y;
+          if(Math.sqrt(dx*dx + dy*dy) < L.r){
+            // pop it
+            createPopEffect(L.x, L.y, L.type);
+            lights.splice(i,1);
+            playPop(L.x, L.y);
+            startOnFirstGesture();
+            return;
+          }
+        }
+      });
+
+      // particle pop effects
+      const sparks = []; // {x,y,vx,vy,life,color}
+      function createPopEffect(x,y,type){
+        const count = type === 'word' ? 18 : 10;
+        for(let i=0;i<count;i++){
+          const ang = Math.random()*Math.PI*2;
+          const spd = (Math.random()*1.6 + 0.6) * (type === 'word' ? 2.2 : 1.4);
+          sparks.push({
+            x, y,
+            vx: Math.cos(ang)*spd,
+            vy: Math.sin(ang)*spd,
+            life: 0,
+            ttl: 60 + Math.random()*40,
+            color: type === 'word' ? `hsl(${200 + Math.random()*80}, 90%, 70%)` : `hsl(${200 + Math.random()*120}, 90%, 70%)`
+          });
+        }
+      }
+
+      // update game state
+      function update(dt){
+        // spawn
+        spawnTimer += dt*1000;
+        if(spawnTimer >= spawnInterval){ spawnTimer = 0; spawnLight(); }
+
+        // orb move towards pointer gently
+        if(pointer.x !== null){
+          const dx = pointer.x - orb.x;
+          orb.x += dx * 0.12;
+        }
+        if(orb.vx) orb.x += orb.vx * dt * 120;
+
+        // clamp
+        orb.x = Math.max(orb.r, Math.min(W-orb.r, orb.x));
+
+        // update lights
+        for(let i=lights.length-1;i>=0;i--){
+          const L = lights[i];
+          // smooth upward drift + small horizontal sway
+          L.y -= L.vy * dt;
+          L.x += Math.sin((Date.now()-L.t)/800 + i) * 0.22;
+
+          // if orb collides with light, pop it (release)
+          const dx = L.x - orb.x; const dy = L.y - orb.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < L.r + orb.r*0.9){
+            createPopEffect(L.x, L.y, L.type);
+            lights.splice(i,1);
+            playPop(L.x, L.y);
+            continue;
+          }
+
+          // remove off-screen
+          if(L.y + L.r < -60) lights.splice(i,1);
+        }
+
+        // update sparks
+        for(let i=sparks.length-1;i>=0;i--){
+          const s = sparks[i];
+          s.x += s.vx * dt * 60;
+          s.y += s.vy * dt * 60;
+          s.vy += 0.06; // gentle gravity to settle
+          s.life++;
+          if(s.life > s.ttl) sparks.splice(i,1);
+        }
+      }
+
+      // draw
+      function draw(){
+        ctx.clearRect(0,0,W,H);
+
+        // subtle aurora glow at top
+        const ag = ctx.createLinearGradient(0,0,0,H*0.6);
+        ag.addColorStop(0, 'rgba(94,231,223,0.06)');
+        ag.addColorStop(0.6, 'rgba(180,144,202,0.02)');
+        ctx.fillStyle = ag;
+        ctx.fillRect(0,0,W,H*0.5);
+
+        // stars scatter
+        for(let i=0;i<40;i++){
+          const sx = (i*71 + 13) % W;
+          const sy = (i*37 + 53) % Math.floor(H*0.5);
+          ctx.fillStyle = 'rgba(255,255,255,0.02)';
+          ctx.fillRect(sx, sy, 1.5, 1.5);
+        }
+
+        // draw lights and words (order by y so overlap looks natural)
+        const drawList = lights.slice().sort((a,b)=>a.y - b.y);
+        for(const L of drawList){
+          // glow
+          const glowRadius = Math.max(12, L.r*2.4);
+          const grd = ctx.createRadialGradient(L.x, L.y, 0, L.x, L.y, glowRadius);
+          grd.addColorStop(0, `hsla(${L.hue},90%,80%,${L.alpha*0.95})`);
+          grd.addColorStop(0.4, `hsla(${L.hue},90%,70%,${L.alpha*0.45})`);
+          grd.addColorStop(1, `hsla(${L.hue},90%,60%,0)`);
+          ctx.beginPath(); ctx.fillStyle = grd; ctx.arc(L.x, L.y, glowRadius, 0, Math.PI*2); ctx.fill();
+
+          // core bubble
+          ctx.beginPath();
+          if(L.type === 'word'){
+            // soft translucent rounded rectangle to fit text
+            ctx.fillStyle = `rgba(255,255,255,0.06)`;
+            const txt = L.word;
+            ctx.font = `${Math.max(12, L.r/2.6)}px Inter, system-ui`;
+            const m = ctx.measureText(txt);
+            const padX = 12; const padY = 8;
+            const w = m.width + padX*2;
+            const h = (L.r) + padY*2;
+            const rx = L.x - w/2;
+            const ry = L.y - h/2;
+            roundRect(ctx, rx, ry, w, h, Math.max(8, L.r/3));
+            ctx.fill();
+
+            // text
+            ctx.fillStyle = `rgba(255,255,255,0.95)`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, L.x, L.y);
+          } else {
+            // luminous circle for light
+            const coreGrad = ctx.createRadialGradient(L.x, L.y, 0, L.x, L.y, L.r);
+            coreGrad.addColorStop(0, `rgba(255,255,255,0.95)`);
+            coreGrad.addColorStop(0.2, `hsla(${L.hue},90%,85%,0.9)`);
+            coreGrad.addColorStop(1, `hsla(${L.hue},90%,60%,0)`);
+            ctx.fillStyle = coreGrad;
+            ctx.arc(L.x, L.y, L.r, 0, Math.PI*2);
+            ctx.fill();
+          }
+        }
+
+        // draw sparks
+        for(const s of sparks){
+          ctx.globalAlpha = Math.max(0, 1 - s.life / s.ttl);
+          ctx.fillStyle = s.color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 2.2, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // draw orb shadow & orb
+        ctx.beginPath(); ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.ellipse(orb.x, orb.y + orb.r*0.9, orb.r*1.1, orb.r*0.45, 0, 0, Math.PI*2); ctx.fill();
+
+        const og = ctx.createRadialGradient(orb.x - orb.r*0.2, orb.y - orb.r*0.4, 1, orb.x, orb.y, orb.r*1.6);
+        og.addColorStop(0, 'rgba(255,255,255,0.95)');
+        og.addColorStop(0.45, 'rgba(255,255,255,0.45)');
+        og.addColorStop(1, 'rgba(255,255,255,0.06)');
+        ctx.beginPath(); ctx.fillStyle = og; ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI*2); ctx.fill();
+
+        ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.arc(orb.x, orb.y, orb.r+6, 0, Math.PI*2); ctx.stroke();
+
+        // HUD label (subtle)
+        ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(12,12,220,46);
+        ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '600 16px Inter, system-ui'; ctx.fillText('Light Catcher — Pop & Release', 20, 36);
+      }
+
+      // render loop
+      function loop(t){
+        if(!lastTime) lastTime = t; const dt = Math.min(0.032, (t-lastTime)/1000); lastTime = t;
+        if(running){ update(dt); draw(); }
+        rafId = requestAnimationFrame(loop);
+      }
+
+      // controls
+      function start(){ if(running) return; running=true; playPauseBtn.textContent='Pause'; lastTime=0; }
+      function pause(){ running=false; playPauseBtn.textContent='Play'; }
+      function toggleRun(){ running? pause(): start(); }
+
+      playPauseBtn.addEventListener('click', ()=>{ toggleRun(); startOnFirstGesture(); });
+      resetBtn.addEventListener('click', ()=>{ lights.length=0; sparks.length=0; });
+      spawnRateInput.addEventListener('input', ()=>{ spawnInterval = Number(spawnRateInput.value); });
+      orbSizeInput.addEventListener('input', ()=>{ orb.r = Number(orbSizeInput.value); });
+      soundToggle.addEventListener('click', ()=>{
+        soundEnabled = !soundEnabled;
+        soundToggle.textContent = soundEnabled ? 'Disable sound' : 'Enable sound';
+        if(soundEnabled){ ensureAudio(); loadPop(); startAmbient(); } else { if(ambientAudio){ ambientAudio.pause(); ambientAudio=null; } }
+      });
+
+      // helpers
+      function roundRect(ctx, x, y, w, h, r){
+        const min = Math.min(w,h)/2;
+        r = Math.min(r, min);
+        ctx.beginPath();
+        ctx.moveTo(x+r, y);
+        ctx.arcTo(x+w, y, x+w, y+h, r);
+        ctx.arcTo(x+w, y+h, x, y+h, r);
+        ctx.arcTo(x, y+h, x, y, r);
+        ctx.arcTo(x, y, x+w, y, r);
+        ctx.closePath();
+      }
+
+      // user gesture starter (autoplay policies)
+      function startOnFirstGesture(){
+        if(userInteracted) return;
+        userInteracted = true;
+        if(soundEnabled){ startAmbient(); }
+      }
+
+      // init
+      function init(){
+        resize(); window.addEventListener('resize', resize);
+        rafId = requestAnimationFrame(loop);
+        // gentle auto spawn when idle (if running)
+        setInterval(()=>{ if(!running) return; if(Math.random() < 0.36) spawnLight(); }, 1200);
+        orb.r = Number(orbSizeInput.value);
+        // start paused
+        pause();
+      }
+
+      init();
+
+      // expose for debug
+      window.__lc = {spawnLight, lights, orb, sparks};
+
+      // accessibility: keyboard toggle via space bar (already wired), and focus behaviour
+      canvas.setAttribute('tabindex','0');
+
+    })();
+  </script>
+</body>
+</html>
